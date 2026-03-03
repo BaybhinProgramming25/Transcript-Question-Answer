@@ -1,8 +1,7 @@
-import { BrowserRouter, Routes, Route  } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 
-import Navbar from './components/Navbar/Navbar'
-import Footer from './components/Footer/Footer'
+import PublicLayout from './components/PublicLayout/PublicLayout'
 
 import PublicRoute from './public-components/PublicRoute'
 import Home from './public-components/Home/Home'
@@ -20,49 +19,51 @@ const App = () => {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <Navbar />
-          <Routes>
+        <Routes>
 
-            <Route path="/" element={
-              <PublicRoute>
+          <Route path="/" element={
+            <PublicRoute>
+              <PublicLayout>
                 <Home />
-              </PublicRoute>
-            } />
+              </PublicLayout>
+            </PublicRoute>
+          } />
 
-            <Route path="/contact" element={
-              <PublicRoute>
+          <Route path="/contact" element={
+            <PublicRoute>
+              <PublicLayout>
                 <ContactUs />
-              </PublicRoute>
-            } />
+              </PublicLayout>
+            </PublicRoute>
+          } />
 
-            <Route path="/login" element={
-              <PublicRoute>
-                <Login />
-              </PublicRoute>
-            } />
+          <Route path="/login" element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          } />
 
-            <Route path="/signup" element={
-              <PublicRoute>
-                <SignUp />
-              </PublicRoute>
-            } /> 
+          <Route path="/signup" element={
+            <PublicRoute>
+              <SignUp />
+            </PublicRoute>
+          } />
 
-            <Route path="/verify-sent" element={
-              <PublicRoute>
-                <EmailSent />
-              </PublicRoute>
-            } />
+          <Route path="/verify-sent" element={
+            <PublicRoute>
+              <EmailSent />
+            </PublicRoute>
+          } />
 
-            <Route path="/parse" element={
-              <ProtectedRoute>
-                <Chat />
-              </ProtectedRoute>
-            } />
+          <Route path="/parse" element={
+            <ProtectedRoute>
+              <Chat />
+            </ProtectedRoute>
+          } />
 
-          </Routes>
-        <Footer />
+        </Routes>
       </BrowserRouter>
-    </AuthProvider> 
+    </AuthProvider>
   )
 }
 

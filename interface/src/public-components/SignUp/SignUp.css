@@ -1,133 +1,128 @@
-.signup-container {
-  min-height: 80vh;
+.auth-page {
+  min-height: 100vh;
   display: flex;
-  justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #0a0a1a 0%, #1a0a2e 100%);
-  padding: 20px;
+  justify-content: center;
+  background-color: var(--bg-app);
+  padding: 24px;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.signup-box {
-  background-color: #16213e;
-  padding: 40px;
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+.auth-card {
   width: 100%;
-  max-width: 420px;
-  opacity: 0;
-  animation: fadeIn 1s ease-out 0.5s forwards;
+  max-width: 400px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 40px 36px;
 }
 
-.signup-box h1 {
-  color: #e4e4ff;
-  font-size: 32px;
-  margin-bottom: 10px;
-  text-align: center;
+.auth-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 28px;
 }
 
-.subtitle {
-  color: #9d9dc7;
-  text-align: center;
-  margin-bottom: 30px;
+.auth-logo-icon {
+  width: 32px;
+  height: 32px;
+  background-color: var(--accent);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.auth-logo-text {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.auth-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.auth-subtitle {
   font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 28px;
 }
 
-.input-group {
-  margin-bottom: 20px;
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
-.input-group label {
-  display: block;
-  color: #e4e4ff;
-  margin-bottom: 8px;
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.auth-field label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.auth-field input {
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  color: var(--text-primary);
   font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s;
+  width: 100%;
+}
+
+.auth-field input:focus {
+  border-color: var(--border-focus);
+}
+
+.auth-field input::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+.auth-submit {
+  margin-top: 6px;
+  padding: 11px;
+  background-color: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-weight: 600;
+  transition: background-color 0.15s;
+  width: 100%;
+}
+
+.auth-submit:hover {
+  background-color: var(--accent-hover);
+}
+
+.auth-switch {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.auth-switch a {
+  color: var(--accent);
   font-weight: 500;
 }
 
-.input-group input {
-  width: 100%;
-  padding: 12px 16px;
-  background-color: #0f1626;
-  border: 2px solid #2a3a5a;
-  border-radius: 8px;
-  color: #e4e4ff;
-  font-size: 16px;
-  transition: border-color 0.3s ease;
-  box-sizing: border-box;
-}
-
-.input-group input:focus {
-  outline: none;
-  border-color: #6c63ff;
-}
-
-.input-group input::placeholder {
-  color: #5a5a7a;
-}
-
-.signup-button {
-  width: 100%;
-  padding: 14px;
-  background: linear-gradient(135deg, #6c63ff 0%, #5a52d5 100%);
-  color: #ffffff;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  margin-top: 10px;
-}
-
-.signup-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(108, 99, 255, 0.4);
-}
-
-.signup-button:active {
-  transform: translateY(0);
-}
-
-.login-link {
-  text-align: center;
-  margin-top: 24px;
-  padding-top: 24px;
-  border-top: 1px solid #2a3a5a;
-}
-
-.login-link p {
-  color: #9d9dc7;
-  font-size: 14px;
-}
-
-.login-link a {
-  color: #8080ff;
-  text-decoration: none;
-  font-weight: 600;
-  transition: color 0.3s ease;
-}
-
-.login-link a:hover {
-  color: #a0a0ff;
-}
-
-@media (max-width: 480px) {
-  .signup-box {
-    padding: 30px 24px;
-  }
-
-  .signup-box h1 {
-    font-size: 28px;
-  }
+.auth-switch a:hover {
+  color: var(--accent-hover);
 }

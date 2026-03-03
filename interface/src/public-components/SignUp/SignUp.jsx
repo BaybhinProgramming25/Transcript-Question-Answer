@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import { useNavigate, Link } from 'react-router-dom';
+import axios from 'axios';
 
 import './SignUp.css';
 
@@ -13,7 +13,6 @@ const SignUp = () => {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-
     e.preventDefault();
 
     if (password !== confirmPassword) {
@@ -22,26 +21,30 @@ const SignUp = () => {
     }
 
     try {
-      var data = { "username": username, "password": password, "email": email }
-      const response = await axios.post('http://localhost:3000/api/signup', data);
+      const data = { username, password, email };
+      const response = await axios.post('/api/signup', data);
       console.log(response);
-      navigate("/verify-sent")
-    }
-    catch (error) {
-      console.error('Error sending sign up data', error)
-      alert('Error signing up. Please try again later...')
+      navigate('/verify-sent');
+    } catch (error) {
+      console.error('Error sending sign up data', error);
+      alert('Error signing up. Please try again later...');
     }
   };
 
   return (
-    <div className="signup-container">
-      <div className="signup-box">
-        <h1>Create Account</h1>
-        <p className="subtitle">Sign up to start using TQA</p>
-        
-        <form onSubmit={handleSubmit}>
-          <div className="input-group">
-            <label htmlFor="name">Full Name</label>
+    <div className="auth-page">
+      <div className="auth-card">
+        <div className="auth-logo">
+          <span className="auth-logo-icon">T</span>
+          <span className="auth-logo-text">TQA</span>
+        </div>
+
+        <h1 className="auth-title">Create account</h1>
+        <p className="auth-subtitle">Sign up to start using TQA</p>
+
+        <form className="auth-form" onSubmit={handleSubmit}>
+          <div className="auth-field">
+            <label htmlFor="name">Username</label>
             <input
               type="text"
               id="name"
@@ -52,7 +55,7 @@ const SignUp = () => {
             />
           </div>
 
-          <div className="input-group">
+          <div className="auth-field">
             <label htmlFor="email">Email</label>
             <input
               type="email"
@@ -64,7 +67,7 @@ const SignUp = () => {
             />
           </div>
 
-          <div className="input-group">
+          <div className="auth-field">
             <label htmlFor="password">Password</label>
             <input
               type="password"
@@ -76,7 +79,7 @@ const SignUp = () => {
             />
           </div>
 
-          <div className="input-group">
+          <div className="auth-field">
             <label htmlFor="confirmPassword">Confirm Password</label>
             <input
               type="password"
@@ -87,14 +90,16 @@ const SignUp = () => {
               required
             />
           </div>
-          <button type="submit" className="signup-button">Sign Up</button>
+
+          <button type="submit" className="auth-submit">Sign Up</button>
         </form>
-        <div className="login-link">
-          <p>Already have an account? <a href="/login">Log in</a></p>
-        </div>
+
+        <p className="auth-switch">
+          Already have an account? <Link to="/login">Log in</Link>
+        </p>
       </div>
     </div>
   );
-}
+};
 
 export default SignUp;

@@ -1,145 +1,122 @@
-.email-sent-container {
-  min-height: 80vh;
+.auth-page {
+  min-height: 100vh;
   display: flex;
-  justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #0a0a1a 0%, #1a0a2e 100%);
-  padding: 40px 20px;
+  justify-content: center;
+  background-color: var(--bg-app);
+  padding: 24px;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.email-sent-box {
-  background-color: #16213e;
-  padding: 50px 40px;
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+.auth-card {
   width: 100%;
-  max-width: 800px;
-  opacity: 0;
-  animation: fadeIn 1s ease-out 0.5s forwards;
+  max-width: 400px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 40px 36px;
 }
 
-.email-sent-box h1 {
-  color: #e4e4ff;
-  font-size: 36px;
-  margin-bottom: 10px;
-  text-align: center;
+.verify-card {
+  max-width: 440px;
 }
 
-.subtitle {
-  color: #9d9dc7;
-  text-align: center;
-  margin-bottom: 40px;
+.auth-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+
+.auth-logo-icon {
+  width: 32px;
+  height: 32px;
+  background-color: var(--accent);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
   font-size: 16px;
 }
 
-.email-sent-content {
-  color: #e4e4ff;
+.auth-logo-text {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
-.sent-section {
-  margin-bottom: 32px;
-}
-
-.sent-section h2 {
-  color: #8080ff;
+.auth-title {
   font-size: 24px;
-  margin-bottom: 12px;
-  border-bottom: 2px solid #2a3a5a;
-  padding-bottom: 8px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 6px;
 }
 
-.sent-section p {
-  color: #c4c4dd;
-  font-size: 16px;
-  line-height: 1.6;
-  margin-bottom: 12px;
+.auth-subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 28px;
 }
 
-.sent-section ul {
+.verify-steps {
   list-style: none;
-  padding-left: 0;
+  padding: 0;
+  margin: 0 0 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  counter-reset: step;
 }
 
-.sent-section ul li {
-  color: #c4c4dd;
-  font-size: 16px;
-  line-height: 1.8;
-  padding-left: 24px;
-  position: relative;
-  margin-bottom: 8px;
+.verify-steps li {
+  counter-increment: step;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  font-size: 14px;
+  color: var(--text-primary);
+  line-height: 1.5;
 }
 
-.sent-section ul li::before {
-  content: "→";
-  color: #6c63ff;
-  font-weight: bold;
-  position: absolute;
-  left: 0;
+.verify-steps li::before {
+  content: counter(step);
+  min-width: 24px;
+  height: 24px;
+  background-color: var(--accent-subtle);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-full);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
 }
 
-.email-sent-footer {
+.verify-note {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+  padding: 10px 14px;
+  background-color: var(--bg-input);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--accent);
+}
+
+.auth-switch {
+  margin-top: 8px;
   text-align: center;
-  margin-top: 40px;
-  padding-top: 24px;
-  border-top: 1px solid #2a3a5a;
+  font-size: 14px;
+  color: var(--text-secondary);
 }
 
-.email-sent-footer p {
-  color: #9d9dc7;
-  font-size: 15px;
+.auth-switch a {
+  color: var(--accent);
+  font-weight: 500;
 }
 
-.email-sent-footer a {
-  color: #8080ff;
-  text-decoration: none;
-  font-weight: 600;
-  transition: color 0.3s ease;
-}
-
-.email-sent-footer a:hover {
-  color: #a0a0ff;
-}
-
-@media (max-width: 768px) {
-  .email-sent-box {
-    padding: 40px 30px;
-  }
-
-  .email-sent-box h1 {
-    font-size: 30px;
-  }
-
-  .sent-section h2 {
-    font-size: 22px;
-  }
-
-  .sent-section p,
-  .sent-section ul li {
-    font-size: 15px;
-  }
-}
-
-@media (max-width: 480px) {
-  .email-sent-box {
-    padding: 30px 24px;
-  }
-
-  .email-sent-box h1 {
-    font-size: 26px;
-  }
-
-  .sent-section h2 {
-    font-size: 20px;
-  }
+.auth-switch a:hover {
+  color: var(--accent-hover);
 }

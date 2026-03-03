@@ -1,148 +1,111 @@
-/* Container for the entire contact page */
-.contact-container {
-  min-height: 80vh;
+.contact-page {
   display: flex;
+  align-items: flex-start;
   justify-content: center;
-  align-items: center;
-  background: linear-gradient(135deg, #0a0a1a 0%, #1a0a2e 100%);
-  padding: 20px;
+  padding: 60px 24px;
+  min-height: calc(100vh - 56px);
 }
 
-/* Fade-in animation */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* The contact box/card */
-.contact-box {
-  background-color: #16213e;
-  padding: 40px;
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+.auth-card {
   width: 100%;
+  max-width: 400px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 40px 36px;
+}
+
+.contact-card {
   max-width: 500px;
-  opacity: 0;
-  animation: fadeIn 1s ease-out 0.5s forwards;
 }
 
-/* Title styling */
-.contact-box h1 {
-  color: #e4e4ff;
-  font-size: 32px;
-  margin-bottom: 10px;
-  text-align: center;
+.auth-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 6px;
 }
 
-/* Subtitle text */
-.subtitle {
-  color: #9d9dc7;
-  text-align: center;
-  margin-bottom: 30px;
+.auth-subtitle {
   font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 28px;
 }
 
-/* Input groups (label + input) */
-.input-group {
-  margin-bottom: 20px;
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
-.input-group label {
-  display: block;
-  color: #e4e4ff;
-  margin-bottom: 8px;
-  font-size: 14px;
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.auth-field label {
+  font-size: 13px;
   font-weight: 500;
+  color: var(--text-secondary);
 }
 
-.input-group input,
-.input-group textarea {
-  width: 100%;
-  padding: 12px 16px;
-  background-color: #0f1626;
-  border: 2px solid #2a3a5a;
-  border-radius: 8px;
-  color: #e4e4ff;
-  font-size: 16px;
-  transition: border-color 0.3s ease;
-  box-sizing: border-box;
-  font-family: inherit;
-}
-
-.input-group textarea {
-  resize: vertical;
-  min-height: 120px;
-}
-
-.input-group input:focus,
-.input-group textarea:focus {
+.auth-field input,
+.auth-field textarea {
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  color: var(--text-primary);
+  font-size: 14px;
   outline: none;
-  border-color: #6c63ff;
-}
-
-.input-group input::placeholder,
-.input-group textarea::placeholder {
-  color: #5a5a7a;
-}
-
-/* Contact button */
-.contact-button {
+  transition: border-color 0.15s;
   width: 100%;
-  padding: 14px;
-  background: linear-gradient(135deg, #6c63ff 0%, #5a52d5 100%);
-  color: #ffffff;
+}
+
+.auth-field textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.auth-field input:focus,
+.auth-field textarea:focus {
+  border-color: var(--border-focus);
+}
+
+.auth-field input::placeholder,
+.auth-field textarea::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+.auth-submit {
+  margin-top: 6px;
+  padding: 11px;
+  background-color: var(--accent);
+  color: #fff;
   border: none;
-  border-radius: 8px;
-  font-size: 16px;
+  border-radius: var(--radius-sm);
+  font-size: 15px;
   font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  margin-top: 10px;
+  transition: background-color 0.15s;
+  width: 100%;
 }
 
-.contact-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(108, 99, 255, 0.4);
+.auth-submit:hover {
+  background-color: var(--accent-hover);
 }
 
-.contact-button:active {
-  transform: translateY(0);
-}
-
-/* Contact info section at bottom */
 .contact-info {
-  text-align: center;
-  margin-top: 30px;
-  padding-top: 24px;
-  border-top: 1px solid #2a3a5a;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .contact-info p {
-  color: #9d9dc7;
   font-size: 14px;
-  margin-bottom: 8px;
-}
-
-.contact-info .phone,
-.contact-info .email-info {
-  color: #8080ff;
-  font-weight: 600;
-  font-size: 15px;
-}
-
-/* Responsive design for smaller screens */
-@media (max-width: 480px) {
-  .contact-box {
-    padding: 30px 24px;
-  }
-
-  .contact-box h1 {
-    font-size: 28px;
-  }
+  color: var(--text-secondary);
 }

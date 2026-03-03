@@ -1,51 +1,40 @@
+import { Link } from 'react-router-dom';
 import './VerifyEmailSent.css';
 
 const EmailSent = () => {
-
   return (
-    <div className="email-sent-container">
-      <div className="email-sent-box">
-        <h1>Check Your Email!</h1>
-        <p className="subtitle">We've sent a verification link to your inbox</p>
-        
-        <div className="email-sent-content">
-          <section className="sent-section">
-            <h2>📧 Email Sent Successfully</h2>
-            <p>
-              We've just sent a verification email to your registered email address. 
-              Please check your inbox and click on the verification link to activate 
-              your account. This helps us ensure your account is secure and that you 
-              have access to all our features.
-            </p>
-          </section>
-
-          <section className="sent-section">
-            <h2>What to Do Next</h2>
-            <ul>
-              <li>Open your email inbox via Mailhog and look for our verification message</li>
-              <li>Click the verification link in the email</li>
-              <li>You'll be redirected back to Maps with your account activated</li>
-              <li>Start exploring all the features we have to offer</li>
-            </ul>
-          </section>
-
-          <section className="sent-section">
-            <h2>Didn't Receive the Email?</h2>
-            <p>
-              If you don't see the email in a few minutes, please check your spam or 
-              junk folder. Sometimes verification emails end up there by mistake. 
-              Make sure to mark it as "not spam" so you can receive future updates 
-              from us without any issues.
-            </p>
-          </section>
+    <div className="auth-page">
+      <div className="auth-card verify-card">
+        <div className="auth-logo">
+          <span className="auth-logo-icon">T</span>
+          <span className="auth-logo-text">TQA</span>
         </div>
 
-        <div className="email-sent-footer">
-          <p>Having trouble? <a href="/contact">Contact support</a> for help!</p>
-        </div>
+        <h1 className="auth-title">Check your email</h1>
+        <p className="auth-subtitle">We've sent a verification link to your inbox</p>
+
+        <ol className="verify-steps">
+          <li>
+            <strong>Open Mailhog</strong> and find our verification message
+          </li>
+          <li>
+            <strong>Click the verification link</strong> in the email to activate your account
+          </li>
+          <li>
+            <strong>You'll be redirected</strong> back to TQA with your account activated
+          </li>
+        </ol>
+
+        <p className="verify-note">
+          Don't see the email? Check your spam folder.
+        </p>
+
+        <p className="auth-switch">
+          Having trouble? <Link to="/contact">Contact support</Link>
+        </p>
       </div>
     </div>
   );
-}
+};
 
 export default EmailSent;

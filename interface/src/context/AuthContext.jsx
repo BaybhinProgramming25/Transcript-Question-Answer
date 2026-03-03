@@ -7,10 +7,12 @@ export const AuthProvider = ({ children }) => {
 
     const [user, setUser] = useState(null);
 
+    // DO NOT WORRY ABOUT USER TOKEN FOR NOW
+    /** 
     useEffect(() => {
         const loadUserToken = async () => {
             try {
-                const response = await axios.post('http://localhost:3000/api/refresh', {}, { withCredentials: true });
+                const response = await axios.post('/api/refresh', {}, { withCredentials: true });
                 setUser(response.data.user_data);
             }
             catch (error) {
@@ -20,6 +22,7 @@ export const AuthProvider = ({ children }) => {
         } 
         loadUserToken();
     }, [])
+    */
 
     const login = (user_data) => { 
         setUser(user_data); 
