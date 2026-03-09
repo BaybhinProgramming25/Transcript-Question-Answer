@@ -1,11 +1,32 @@
 services:
+  tqa-mysql:
+    image: mysql
+    ports:
+      - "3306:3306"
+    env_file:
+      - ./backend/.env
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 5 
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - tqa 
+
   backend:
     image: tqa-backend 
     build: 
       context: ./backend 
       dockerfile: Dockerfile 
+    env_file:
+      - ./backend/.env
     ports:
       - "3000:3000"
+    depends_on:
+      tqa-mysql:
+        condition: service_healthy
     networks:
       - tqa 
 
@@ -14,28 +35,12 @@ services:
     build:
       context: ./frontend 
       dockerfile: Dockerfile 
+    env_file:
+      - ./frontend/.env
     ports:
       - "5173:5173"
-    depends_on:
-      - tqa-mysql
     networks:
       - tqa  
-  
-  tqa-mysql:
-    image: mysql
-    restart: always 
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 5s
-      timeout: 3s
-      retries: 5 
-    volumes:
-      - mysql-data:/var/lib/mysql
 
 volumes:
   mysql-data:
