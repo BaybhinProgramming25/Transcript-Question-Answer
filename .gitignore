@@ -1,9 +1,6 @@
 # Ignore vscode folder 
 .vscode/
 
-# Ignore PDF data 
-PDFs/
-
 # Ignore env 
 env/
 **/.env
@@ -16,11 +13,6 @@ __pycache__/**
 # Ignore all possible node_modules
 */node_modules/
 
-# Volume where it contains all of the persistent data 
-PersistentData/
-
-# Ignore data folder 
-data/ 
-
-# Ignore chroma-data
-chroma-data/
+# Ignore MySQL and Redis Data
+mysql-data/
+redis-data/
