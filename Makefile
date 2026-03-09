@@ -6,11 +6,11 @@ up:
 down:
 	docker compose down
 
-# Restart everything (the one you want!)
+# Restart everything
 restart:
 	docker compose down
 	docker compose up -d --build
 
-# See logs
+# Visit logs
 logs:
 	docker compose logs -f
