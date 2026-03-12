@@ -1,16 +1,16 @@
-import os
-import shutil
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from sqlalchemy.orm import Session
-
 from database.database import get_db
 from database.models import Document
 from helpers.jwt import get_current_user
-from helpers.parse import parse_pdf
+from helpers.parse import parse_pdf, chunk_pdf
+from rag import init_db
 
+import os
+
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 UPLOADS_DIR = "/uploads"
 router = APIRouter()
-
 
 @router.post("/api/documents")
 def upload_document(
@@ -27,10 +27,10 @@ def upload_document(
 
     filepath = os.path.join(user_dir, file.filename)
 
+    pdf_bytes = file.file.read()
     with open(filepath, "wb") as f:
-        shutil.copyfileobj(file.file, f)
-
-    size = os.path.getsize(filepath)
+        f.write(pdf_bytes)
+    size = len(pdf_bytes)
 
     doc = Document(
         user_email=user_email,
@@ -42,8 +42,9 @@ def upload_document(
     db.commit()
     db.refresh(doc)
 
-    
-    clean_data = parse_pdf(file)
+    data = parse_pdf(pdf_bytes)
+    chunks = chunk_pdf(data)
+    init_db(chunks, doc.id, OPENAI_API_KEY)
 
     return {
         "id": doc.id,

@@ -1,27 +1,36 @@
 """This is where we parse the PDF"""
-from fastapi import UploadFile
-from pdf2image import convert_from_bytes
-import pytesseract
+from helpers.classcontent import get_content_from_each_sem
+from helpers.semmapping import get_sem_mapping
 
-def parse_pdf(file: UploadFile):
+import fitz 
 
-    file.file.seek(0) # Move the file pointer back to 0 to read from the PDF again 
-    pdf_bytes = file.file.read()
-    images = convert_from_bytes(pdf_bytes)
+def parse_pdf(file_bytes) -> list[str]:
 
-    # Turn them into text
-    text = ""
-    for i, image in enumerate(images):
-        print(f"-----PAGE {i + 1} ------- ")
-        page_text = pytesseract.image_to_string(image)
-        print(page_text) # Let's see the current text currently
-        text += page_text
-    
-    return text 
+    doc = fitz.open(stream=file_bytes, filetype="pdf")
+
+    pdf_pages_list = []
+    for page in doc:
+        text = page.get_text("text").strip("").split("\n")
+        pdf_pages_list.extend(text)
+
+    sm_ll = get_sem_mapping(pdf_pages_list)
+    student_classes = get_content_from_each_sem(sm_ll, pdf_pages_list) 
+    return student_classes[0] # Just return the first item for now 
 
 
-def chunk_text(text: str): 
+def chunk_pdf(text_list: list) -> list[str]:
 
-    # Then we perform chunking 
-    pass # To be implemented later 
+    chunk_size = 5
+    chunk_overlap = 2
 
+    chunks = []
+    start = 0
+
+    while start < len(text_list):
+        end = start + chunk_size
+        chunk_words = text_list[start:end]
+        chunk_text = " ".join(chunk_words)
+
+        chunks.append(chunk_text)
+        start += chunk_size - chunk_overlap
+    return chunks 

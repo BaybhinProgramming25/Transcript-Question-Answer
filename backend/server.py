@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 
 from controllers.user import router as user_router
 from controllers.documents import router as documents_router
+from controllers.qa import router as qa_router
 from database.database import engine, Base
 import os
 
@@ -11,7 +12,8 @@ import os
 async def lifespan(app: FastAPI):
     os.makedirs("../mysql-data", exist_ok=True) # Make folder for MySQL
     os.makedirs("../redis-data", exist_ok=True) # Make folder for Redis
-    os.makedirs("/uploads", exist_ok=True) # Make folder for uploaded PDFs
+    os.makedirs("/uploads", exist_ok=True)       # Make folder for uploaded PDFs
+    os.makedirs("data", exist_ok=True)           # Make folder for FAISS indexes
     Base.metadata.create_all(bind=engine) # SQLAlchemy 
     print('Tables Created!')
     yield 
@@ -33,7 +35,7 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-# app.include_router(qa_router)
+app.include_router(qa_router)
 app.include_router(user_router)
 app.include_router(documents_router)
 
