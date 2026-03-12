@@ -10,10 +10,9 @@ import os
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    os.makedirs("../mysql-data", exist_ok=True) # Make folder for MySQL
-    os.makedirs("../redis-data", exist_ok=True) # Make folder for Redis
-    os.makedirs("/uploads", exist_ok=True)       # Make folder for uploaded PDFs
-    os.makedirs("data", exist_ok=True)           # Make folder for FAISS indexes
+    os.makedirs("../mysql-data", exist_ok=True) 
+    os.makedirs("/uploads", exist_ok=True)   
+    os.makedirs("data", exist_ok=True)  
     Base.metadata.create_all(bind=engine) # SQLAlchemy 
     print('Tables Created!')
     yield 
