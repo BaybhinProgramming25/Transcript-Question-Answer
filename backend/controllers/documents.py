@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from database.database import get_db
 from database.models import Document
 from helpers.jwt import get_current_user
+from helpers.parse import parse_pdf
 
 UPLOADS_DIR = "/uploads"
 router = APIRouter()
@@ -40,6 +41,9 @@ def upload_document(
     db.add(doc)
     db.commit()
     db.refresh(doc)
+
+    
+    clean_data = parse_pdf(file)
 
     return {
         "id": doc.id,
