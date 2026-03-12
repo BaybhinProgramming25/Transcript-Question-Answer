@@ -22,13 +22,14 @@ services:
       dockerfile: Dockerfile 
     env_file:
       - ./backend/.env
-    ports:
-      - "3000:3000"
     depends_on:
       tqa-mysql:
         condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - uploads-data:/uploads
     networks:
-      - tqa 
+      - tqa
 
   frontend:
     image: tqa-frontend
@@ -37,6 +38,9 @@ services:
       dockerfile: Dockerfile 
     env_file:
       - ./frontend/.env
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
     ports:
       - "5173:5173"
     networks:
@@ -44,5 +48,6 @@ services:
 
 volumes:
   mysql-data:
+  uploads-data:
 networks:
   tqa: 
