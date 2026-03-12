@@ -4,7 +4,7 @@
   --bg-input: #2f2f2f;
   --bg-card: #2a2a2a;
   --bg-message-ai: #2f2f2f;
-  --bg-message-user: #7c3aed;
+  --bg-message-user: #1d4ed8;
 
   --border-subtle: rgba(255, 255, 255, 0.1);
   --border-focus: rgba(255, 255, 255, 0.3);
@@ -12,9 +12,9 @@
   --text-primary: #ececec;
   --text-secondary: #9b9b9b;
 
-  --accent: #7c3aed;
-  --accent-hover: #6d28d9;
-  --accent-subtle: rgba(124, 58, 237, 0.15);
+  --accent: #1d4ed8;
+  --accent-hover: #1e40af;
+  --accent-subtle: rgba(29, 78, 216, 0.15);
 
   --danger: #ef4444;
 

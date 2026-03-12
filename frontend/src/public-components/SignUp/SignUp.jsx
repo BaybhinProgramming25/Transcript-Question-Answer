@@ -1,33 +1,36 @@
 import { useState } from 'react';
+import { useAuth } from '../../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
 
 import './SignUp.css';
 
 const SignUp = () => {
 
-  const [username, setUserName] = useState('');
+  const { signup } = useAuth();
+  const navigate = useNavigate();
+
+  const [firstname, setFirstName] = useState('');
+  const [lastname, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const navigate = useNavigate();
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
 
     if (password !== confirmPassword) {
-      alert('Passwords do not match! Please try again');
+      setError('Passwords do not match.');
       return;
     }
 
     try {
-      const data = { username, password, email };
-      const response = await axios.post('/api/signup', data);
-      console.log(response);
-      navigate('/verify-sent');
-    } catch (error) {
-      console.error('Error sending sign up data', error);
-      alert('Error signing up. Please try again later...');
+      await signup(firstname, lastname, email, password);
+      navigate('/parse');
+    } catch (err) {
+      const message = err.response?.data?.detail || 'Error signing up. Please try again.';
+      setError(message);
     }
   };
 
@@ -42,15 +45,28 @@ const SignUp = () => {
         <h1 className="auth-title">Create account</h1>
         <p className="auth-subtitle">Sign up to start using TQA</p>
 
+        {error && <p className="auth-error">{error}</p>}
+
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="auth-field">
-            <label htmlFor="name">Username</label>
+            <label htmlFor="firstname">Firstname</label>
             <input
               type="text"
-              id="name"
-              value={username}
-              onChange={(e) => setUserName(e.target.value)}
-              placeholder="Enter a username"
+              id="firstname"
+              value={firstname}
+              onChange={(e) => setFirstName(e.target.value)}
+              placeholder="Enter a firstname"
+              required
+            />
+          </div>
+          <div className="auth-field">
+            <label htmlFor="lastname">Lastname</label>
+            <input
+              type="text"
+              id="lastname"
+              value={lastname}
+              onChange={(e) => setLastName(e.target.value)}
+              placeholder="Enter a lastname"
               required
             />
           </div>

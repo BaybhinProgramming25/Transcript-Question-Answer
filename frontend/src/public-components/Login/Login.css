@@ -129,3 +129,10 @@
 .auth-switch a:hover {
   color: var(--accent-hover);
 }
+
+.auth-error {
+  color: #e53e3e;
+  font-size: 0.875rem;
+  margin-bottom: 0.75rem;
+  text-align: center;
+}

@@ -11,8 +11,8 @@ export default defineConfig({
       usePolling: true
     },
     proxy: {
-      '/api': 'http://localhost:3000',
-      '/parse': 'http://localhost:3000',
+      '/api': 'http://backend:3000',
+      '/parse': 'http://backend:3000',
     }
   }
 })

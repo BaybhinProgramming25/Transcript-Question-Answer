@@ -1,32 +1,28 @@
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
 
 import './Login.css';
 
 const Login = () => {
 
+  const { login } = useAuth();
+  // const navigate = useNavigate();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
-  const { login } = useAuth();
-  const navigate = useNavigate();
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const data = { email, password };
+    setError('');
 
     try {
-      console.log(data);
-      const response = await axios.post('/api/login', data);
-      const { user_data } = response.data;
-      // login(user_data);
+      await login(email, password);
       // navigate('/parse');
-    } catch (error) {
-      console.error('Error logging in', error);
-      alert('Unable to login. Please try again later...');
+    } catch (err) {
+      const message = err.response?.data?.detail || 'Unable to login. Please try again.';
+      setError(message);
     }
   };
 
@@ -40,6 +36,8 @@ const Login = () => {
 
         <h1 className="auth-title">Welcome back</h1>
         <p className="auth-subtitle">Log in to your TQA account</p>
+
+        {error && <p className="auth-error">{error}</p>}
 
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="auth-field">
@@ -70,7 +68,7 @@ const Login = () => {
         </form>
 
         <p className="auth-switch">
-          Don't have an account? <Link to="/signup">Sign up</Link>
+          Don't have an account? <Link to="/signup">Sign Up</Link>
         </p>
       </div>
     </div>
