@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from database.database import get_db
 from database.models import Document
 from helpers.jwt import get_current_user
-from helpers.parse import parse_pdf, chunk_pdf
+from helpers.getchunks import parse_pdf 
 from rag import init_db
 
 import os
@@ -42,8 +42,13 @@ def upload_document(
     db.commit()
     db.refresh(doc)
 
-    data = parse_pdf(pdf_bytes)
-    chunks = chunk_pdf(data)
+    print(f"""
+        ID: {doc.id}
+        Name: {doc.filename}
+        Size: {doc.size}
+    """)
+
+    chunks = parse_pdf(pdf_bytes)
     init_db(chunks, doc.id, OPENAI_API_KEY)
 
     return {

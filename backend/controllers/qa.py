@@ -20,6 +20,10 @@ def parse(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
+    
+    print(db)
+    print(current_user)
+
     if not message.strip():
         raise HTTPException(status_code=400, detail="Message cannot be empty")
 
@@ -29,6 +33,8 @@ def parse(
     ).first()
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found")
+
+    print(doc)
 
     answer = query(message, doc.id, OPENAI_API_KEY)
     return JSONResponse(content={"message": answer})

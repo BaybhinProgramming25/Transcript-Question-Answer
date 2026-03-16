@@ -9,8 +9,7 @@ STUDENT_ID = "Student ID"
 TRANSFER_FORMARTS = ["LVL", "/AP"]
 
 # Avoided classes
-AVOIDED_CLASSES = ["TBA", "TBD"] # These may appear and we should neglect them 
-
+AVOIDED_CLASSES = ["TBA", "TBD"] 
 # Avoided Words
 TERMINATING_WORDS = ["Term", "Cum", "Transfer"]
 
