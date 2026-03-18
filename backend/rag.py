@@ -57,11 +57,13 @@ def query(question: str, doc_id: int, openai_api_key: str) -> str:
     """Retrieve relevant chunks and answer the question using the LLM."""
 
     vector_store = load_db(doc_id, openai_api_key)
-    retriever = vector_store.as_retriever(search_kwargs={"k": 15})
+    retriever = vector_store.as_retriever(search_kwargs={"k": 5})
 
     prompt = PromptTemplate.from_template("""
-You are a helpful assistant that answers questions about a student's academic transcript.
-Use only the context provided to answer. If the answer is not in the context, say you don't know.
+You are a helpful assistant that answers questions about a student's academic transcript. \
+Use only the context provided to answer. Answer directly as if you were talking to a real student. \
+Start with the answer and only add relevant details if necessary \
+If the answer is not in the context, say you don't know.
 
 Context:
 {context}
