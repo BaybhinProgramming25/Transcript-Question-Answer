@@ -4,11 +4,12 @@ import { useAuth } from '../../context/AuthContext';
 import api from '../../api/index.js';
 import './Sidebar.css';
 
-const Sidebar = ({ onNewChat, onSelectDoc, selectedDoc }) => {
+const Sidebar = ({ onSelectDoc, selectedDoc }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   const [documents, setDocuments] = useState([]);
+  const [uploadProgress, setUploadProgress] = useState(null);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -31,12 +32,18 @@ const Sidebar = ({ onNewChat, onSelectDoc, selectedDoc }) => {
     const formData = new FormData();
     formData.append('file', file);
 
+    setUploadProgress(0);
     try {
-      const response = await api.post('/api/documents', formData);
+      const response = await api.post('/api/documents', formData, {
+        onUploadProgress: (event) => {
+          setUploadProgress(Math.round((event.loaded / event.total) * 100));
+        },
+      });
       setDocuments(prev => [...prev, response.data]);
     } catch (err) {
       alert(err.response?.data?.detail || 'Failed to upload document.');
     } finally {
+      setUploadProgress(null);
       e.target.value = '';
     }
   };
@@ -45,6 +52,7 @@ const Sidebar = ({ onNewChat, onSelectDoc, selectedDoc }) => {
     try {
       await api.delete(`/api/documents/${docId}`);
       setDocuments(prev => prev.filter(d => d.id !== docId));
+      if (selectedDoc?.id === docId) onSelectDoc(null);
     } catch {
       alert('Failed to delete document.');
     }
@@ -78,6 +86,7 @@ const Sidebar = ({ onNewChat, onSelectDoc, selectedDoc }) => {
           <button
             className="sidebar-upload-btn"
             onClick={() => fileInputRef.current.click()}
+            disabled={uploadProgress !== null}
             title="Upload PDF"
           >
             + Upload
@@ -90,6 +99,15 @@ const Sidebar = ({ onNewChat, onSelectDoc, selectedDoc }) => {
             style={{ display: 'none' }}
           />
         </div>
+
+        {uploadProgress !== null && (
+          <div className="sidebar-upload-progress">
+            <div className="sidebar-upload-progress-bar" style={{ width: `${uploadProgress}%` }} />
+            <span className="sidebar-upload-progress-label">
+              {uploadProgress < 100 ? `Uploading… ${uploadProgress}%` : 'Processing…'}
+            </span>
+          </div>
+        )}
 
         <ul className="sidebar-documents-list">
           {documents.length === 0 && (

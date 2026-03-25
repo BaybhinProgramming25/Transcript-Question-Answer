@@ -17,16 +17,21 @@ const Chat = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
 
-  const handleNewChat = () => {
-    setMessages([]);
-    setInputValue('');
-    setSelectedDoc(null);
-  };
-
-  const handleSelectDoc = (doc) => {
-    setMessages([]);
+  const handleSelectDoc = async (doc) => {
     setInputValue('');
     setSelectedDoc(doc);
+    if (!doc) { setMessages([]); return; }
+    try {
+      const response = await api.get(`/api/messages/${doc.id}`);
+      setMessages(response.data.map(m => ({
+        id: m.id,
+        text: m.text,
+        sender: m.sender,
+        timestamp: new Date(m.created_at).toLocaleTimeString(),
+      })));
+    } catch {
+      setMessages([]);
+    }
   };
 
   const handleSendMessage = async () => {
@@ -54,16 +59,14 @@ const Chat = () => {
 
       const response = await api.post('/parse', formData);
 
-      setTimeout(() => {
-        const aiMessage = {
-          id: Date.now() + 1,
-          text: response.data.message,
-          sender: 'ai',
-          timestamp: new Date().toLocaleTimeString()
-        };
-        setMessages(prev => [...prev, aiMessage]);
-        setIsLoading(false);
-      }, 1000);
+      const aiMessage = {
+        id: Date.now() + 1,
+        text: response.data.message,
+        sender: 'ai',
+        timestamp: new Date().toLocaleTimeString(),
+      };
+      setMessages(prev => [...prev, aiMessage]);
+      setIsLoading(false);
     } catch {
       const aiMessage = {
         id: Date.now() + 1,
@@ -94,14 +97,13 @@ const Chat = () => {
 
   return (
     <div className="chat-page">
-      <Sidebar onNewChat={handleNewChat} onSelectDoc={handleSelectDoc} selectedDoc={selectedDoc} />
+      <Sidebar onSelectDoc={handleSelectDoc} selectedDoc={selectedDoc} />
 
       <div className="chat-main">
 
         {selectedDoc && (
           <div className="chat-doc-banner">
             <span>📄 {selectedDoc.filename}</span>
-            <button className="chat-doc-banner-close" onClick={() => setSelectedDoc(null)}>✕</button>
           </div>
         )}
 
