@@ -28,6 +28,9 @@ def upload_document(
     filepath = os.path.join(user_dir, file.filename)
 
     pdf_bytes = file.file.read()
+    if not pdf_bytes.startswith(b"%PDF"):
+        raise HTTPException(status_code=400, detail="Only PDF files are allowed")
+
     with open(filepath, "wb") as f:
         f.write(pdf_bytes)
     size = len(pdf_bytes)
