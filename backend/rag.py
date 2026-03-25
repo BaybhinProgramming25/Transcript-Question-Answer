@@ -21,6 +21,8 @@ def get_embeddings(openai_api_key: str) -> OpenAIEmbeddings:
 _index_cache: dict[str, FAISS] = {}
 
 
+
+
 def init_db(chunks: list[tuple[str, dict]], index_key: str, openai_api_key: str):
     """Embed chunks and save a FAISS index for the given document."""
 
@@ -42,6 +44,8 @@ def init_db(chunks: list[tuple[str, dict]], index_key: str, openai_api_key: str)
     print(f"[saved] Done")
 
 
+
+
 def load_db(index_key: str, openai_api_key: str) -> FAISS:
     """Load a FAISS index for the given document, caching it in memory."""
 
@@ -55,6 +59,8 @@ def load_db(index_key: str, openai_api_key: str) -> FAISS:
     return _index_cache[index_key]
 
 
+
+
 def delete_index(index_key: str):
     """Remove a FAISS index from disk and evict it from the in-memory cache."""
 
@@ -65,6 +71,8 @@ def delete_index(index_key: str):
         print(f"[deleted] Removed FAISS index at {index_path}")
 
     _index_cache.pop(index_key, None)
+
+
 
 
 def query(question: str, index_key: str, openai_api_key: str) -> str:
