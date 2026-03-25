@@ -16,22 +16,24 @@ def get_embeddings(openai_api_key: str) -> OpenAIEmbeddings:
     if _embeddings is None:
         _embeddings = OpenAIEmbeddings(api_key=openai_api_key, model="text-embedding-3-small")
     return _embeddings
-_index_cache: dict[int, FAISS] = {}
 
 
-def init_db(chunks: list[tuple[str, dict]], doc_id: int, openai_api_key: str):
+_index_cache: dict[str, FAISS] = {}
+
+
+def init_db(chunks: list[tuple[str, dict]], index_key: str, openai_api_key: str):
     """Embed chunks and save a FAISS index for the given document."""
 
     os.makedirs(DATA_DIR, exist_ok=True)
-    index_path = os.path.join(DATA_DIR, f"faiss_index_{doc_id}")
+    index_path = os.path.join(DATA_DIR, f"faiss_index_{index_key}")
 
     if os.path.exists(index_path):
-        print(f"[cache hit] Index for doc {doc_id} already exists, skipping")
+        print(f"[cache hit] Index for {index_key} already exists, skipping")
         return
 
     docs = [Document(page_content=chunk, metadata=metadata) for chunk, metadata in chunks]
 
-    print(f"[embedding] Embedding {len(docs)} chunks for doc {doc_id}...")
+    print(f"[embedding] Embedding {len(docs)} chunks for {index_key}...")
     vector_store = FAISS.from_documents(docs, get_embeddings(openai_api_key))
 
     print(f"[saving] Writing FAISS index to {index_path}")
@@ -40,23 +42,35 @@ def init_db(chunks: list[tuple[str, dict]], doc_id: int, openai_api_key: str):
     print(f"[saved] Done")
 
 
-def load_db(doc_id: int, openai_api_key: str) -> FAISS:
+def load_db(index_key: str, openai_api_key: str) -> FAISS:
     """Load a FAISS index for the given document, caching it in memory."""
 
-    if doc_id not in _index_cache:
-        index_path = os.path.join(DATA_DIR, f"faiss_index_{doc_id}")
-        _index_cache[doc_id] = FAISS.load_local(index_path, get_embeddings(openai_api_key), allow_dangerous_deserialization=True)
-        print(f"[cache miss] Loaded index for doc {doc_id} from disk")
+    if index_key not in _index_cache:
+        index_path = os.path.join(DATA_DIR, f"faiss_index_{index_key}")
+        _index_cache[index_key] = FAISS.load_local(index_path, get_embeddings(openai_api_key), allow_dangerous_deserialization=True)
+        print(f"[cache miss] Loaded index for {index_key} from disk")
     else:
-        print(f"[cache hit] Index for doc {doc_id} already in memory")
+        print(f"[cache hit] Index for {index_key} already in memory")
 
-    return _index_cache[doc_id]
+    return _index_cache[index_key]
 
 
-def query(question: str, doc_id: int, openai_api_key: str) -> str:
+def delete_index(index_key: str):
+    """Remove a FAISS index from disk and evict it from the in-memory cache."""
+
+    index_path = os.path.join(DATA_DIR, f"faiss_index_{index_key}")
+    if os.path.exists(index_path):
+        import shutil
+        shutil.rmtree(index_path)
+        print(f"[deleted] Removed FAISS index at {index_path}")
+
+    _index_cache.pop(index_key, None)
+
+
+def query(question: str, index_key: str, openai_api_key: str) -> str:
     """Retrieve relevant chunks and answer the question using the LLM."""
 
-    vector_store = load_db(doc_id, openai_api_key)
+    vector_store = load_db(index_key, openai_api_key)
     retriever = vector_store.as_retriever(search_kwargs={"k": 5})
 
     prompt = PromptTemplate.from_template("""
