@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from sqlalchemy.orm import Session
 from database.database import get_db
-from database.models import Document
+from database.models import Document, Message
 from helpers.jwt import get_current_user
-from helpers.getchunks import parse_pdf 
-from rag import init_db
+from helpers.getchunks import parse_pdf
+from rag import init_db, delete_index
 
 import os
 
@@ -22,6 +22,10 @@ def upload_document(
         raise HTTPException(status_code=400, detail="Only PDF files are allowed")
 
     user_email = current_user["username"]
+
+    if db.query(Document).filter(Document.user_email == user_email, Document.filename == file.filename).first():
+        raise HTTPException(status_code=409, detail="A document with this name already exists")
+
     user_dir = os.path.join(UPLOADS_DIR, user_email)
     os.makedirs(user_dir, exist_ok=True)
 
@@ -52,7 +56,7 @@ def upload_document(
     """)
 
     chunks = parse_pdf(pdf_bytes)
-    init_db(chunks, doc.id, OPENAI_API_KEY)
+    init_db(chunks, f"{user_email}_{file.filename}", OPENAI_API_KEY)
 
     return {
         "id": doc.id,
@@ -94,6 +98,9 @@ def delete_document(
 
     if os.path.exists(doc.filepath):
         os.remove(doc.filepath)
+
+    delete_index(f"{user_email}_{doc.filename}")
+    db.query(Message).filter(Message.document_id == doc_id).delete()
 
     db.delete(doc)
     db.commit()
