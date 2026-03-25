@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api/index.js';
 
 import Sidebar from '../components/Sidebar/Sidebar';
 import './Chat.css';
@@ -52,7 +52,7 @@ const Chat = () => {
         textareaRef.current.style.height = 'auto';
       }
 
-      const response = await axios.post('/parse', formData, { withCredentials: true });
+      const response = await api.post('/parse', formData);
 
       setTimeout(() => {
         const aiMessage = {

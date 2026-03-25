@@ -7,8 +7,6 @@ import PublicRoute from './public-components/PublicRoute'
 import Home from './public-components/Home/Home'
 import Login from './public-components/Login/Login'
 import SignUp from './public-components/SignUp/SignUp'
-import EmailSent from './public-components/VerifySent/VerifyEmailSent'
-
 import ProtectedRoute from './protected-components/ProtectedRoute'
 import Chat from './protected-components/Chat'
 
@@ -44,13 +42,7 @@ const App = () => {
             </PublicRoute>
           } />
 
-          <Route path="/verify-sent" element={
-            <PublicRoute>
-              <EmailSent />
-            </PublicRoute>
-          } />
-
-          <Route path="/parse" element={
+<Route path="/parse" element={
             <ProtectedRoute>
               <Chat />
             </ProtectedRoute>
