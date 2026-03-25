@@ -32,6 +32,6 @@ def create_token(data: dict) -> str:
 def verify_token(token: str):
     try:
         payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[ALGORITHM])
-        return payload 
-    except:
-        return None # Invalid JWT token provided 
+        return payload
+    except (jwt.ExpiredSignatureError, jwt.InvalidTokenError):
+        return None # Invalid JWT token provided
