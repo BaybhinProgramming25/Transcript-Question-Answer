@@ -22,5 +22,7 @@ backend/data
 
 # Ignore testing
 backend/dataset.py
-backend/evaluate.py 
+backend/evaluate.py
 backend/results.json
+backend/generate_pairs.py
+backend/prompt_pairs.jsonl
