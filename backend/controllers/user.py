@@ -13,8 +13,11 @@ from helpers.jwt import create_token
 from helpers.hashing import hash_password, verify_password
 from helpers.limiter import limiter
 
+import logging
+
 router = APIRouter()
 load_dotenv()
+logger = logging.getLogger(__name__)
 
 
 @router.post("/api/login")
@@ -26,12 +29,15 @@ def login(request: Request, data: LoginData, db: Session = Depends(get_db)):
 
         if not user:
             raise HTTPException(status_code=404, detail="Email not found")
-        
+
         if not verify_password(data.password, user.password):
             raise HTTPException(status_code=401, detail="Invalid Password")
 
+    except HTTPException:
+        raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Internal Server Error {e}")
+        logger.error("Login error: %s", e)
+        raise HTTPException(status_code=500, detail="An unexpected error occurred")
 
 
     token = create_token({"username": data.email})
