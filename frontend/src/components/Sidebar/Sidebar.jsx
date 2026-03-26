@@ -10,6 +10,7 @@ const Sidebar = ({ onSelectDoc, selectedDoc }) => {
 
   const [documents, setDocuments] = useState([]);
   const [uploadProgress, setUploadProgress] = useState(null);
+  const [error, setError] = useState('');
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -41,7 +42,7 @@ const Sidebar = ({ onSelectDoc, selectedDoc }) => {
       });
       setDocuments(prev => [...prev, response.data]);
     } catch (err) {
-      alert(err.response?.data?.detail || 'Failed to upload document.');
+      setError(err.response?.data?.detail || 'Failed to upload document.');
     } finally {
       setUploadProgress(null);
       e.target.value = '';
@@ -58,7 +59,7 @@ const Sidebar = ({ onSelectDoc, selectedDoc }) => {
       a.click();
       URL.revokeObjectURL(url);
     } catch {
-      alert('Failed to export document.');
+      setError('Failed to export document.');
     }
   };
 
@@ -68,7 +69,7 @@ const Sidebar = ({ onSelectDoc, selectedDoc }) => {
       setDocuments(prev => prev.filter(d => d.id !== docId));
       if (selectedDoc?.id === docId) onSelectDoc(null);
     } catch {
-      alert('Failed to delete document.');
+      setError('Failed to delete document.');
     }
   };
 
@@ -121,6 +122,10 @@ const Sidebar = ({ onSelectDoc, selectedDoc }) => {
               {uploadProgress < 100 ? `Uploading… ${uploadProgress}%` : 'Processing…'}
             </span>
           </div>
+        )}
+
+        {error && (
+          <p className="sidebar-error" onClick={() => setError('')}>{error}</p>
         )}
 
         <ul className="sidebar-documents-list">
