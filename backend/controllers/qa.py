@@ -1,10 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, Form
+from fastapi import APIRouter, Depends, HTTPException, Form, Request
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from database.database import get_db
 from database.models import Document, Message
 from helpers.jwt import get_current_user
+from helpers.limiter import limiter
 from rag import query
 
 import os
@@ -45,7 +46,9 @@ def get_messages(
 
 
 @router.post("/parse")
+@limiter.limit("10/minute")
 def parse(
+    request: Request,
     message: str = Form(...),
     document_id: int = Form(...),
     db: Session = Depends(get_db),

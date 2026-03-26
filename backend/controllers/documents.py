@@ -1,10 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Request
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from database.database import get_db
 from database.models import Document, Message
 from helpers.jwt import get_current_user
 from helpers.getchunks import parse_pdf
+from helpers.limiter import limiter
 from rag import init_db, delete_index
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment
@@ -19,7 +20,9 @@ router = APIRouter()
 
 
 @router.post("/api/documents")
+@limiter.limit("5/minute")
 def upload_document(
+    request: Request,
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user)

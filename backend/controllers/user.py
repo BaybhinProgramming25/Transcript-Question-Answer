@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends 
+from fastapi import APIRouter, HTTPException, Depends, Request
 from fastapi.responses import JSONResponse
 
 from dotenv import load_dotenv
@@ -6,18 +6,20 @@ from dotenv import load_dotenv
 from classes.userdata import LoginData, SignUpData
 from sqlalchemy.orm import Session
 
-from database.models import User 
+from database.models import User
 from database.database import get_db
 
 from helpers.jwt import create_token
 from helpers.hashing import hash_password, verify_password
+from helpers.limiter import limiter
 
 router = APIRouter()
 load_dotenv()
 
 
 @router.post("/api/login")
-def login(data: LoginData, db: Session = Depends(get_db)):
+@limiter.limit("5/minute")
+def login(request: Request, data: LoginData, db: Session = Depends(get_db)):
 
     try:
         user = db.query(User).filter(User.email == data.email).first()
@@ -57,7 +59,8 @@ def logout():
 
 
 @router.post("/api/signup")
-def signup(data: SignUpData, db: Session = Depends(get_db)):
+@limiter.limit("3/minute")
+def signup(request: Request, data: SignUpData, db: Session = Depends(get_db)):
 
     email_exists = db.query(User).filter(User.email == data.email).first()
     if email_exists:
