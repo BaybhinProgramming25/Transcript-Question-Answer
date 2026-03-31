@@ -11,15 +11,17 @@ from controllers.qa import router as qa_router
 from database.database import engine, Base
 from helpers.limiter import limiter
 from sqlalchemy import text
+from dotenv import load_dotenv
 import os
+
+load_dotenv()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    os.makedirs("../mysql-data", exist_ok=True) 
-    os.makedirs("/uploads", exist_ok=True)   
-    os.makedirs("data", exist_ok=True)  
+    os.makedirs(os.getenv("UPLOADS_DIR", "/uploads"), exist_ok=True)
+    os.makedirs(os.getenv("DATA_DIR", "data"), exist_ok=True)
     Base.metadata.create_all(bind=engine)
-    yield 
+    yield
 
 app = FastAPI(lifespan=lifespan)
 app.state.limiter = limiter
@@ -27,6 +29,9 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(SlowAPIMiddleware)
 
 origins = ["http://localhost:5173"]
+frontend_url = os.getenv("FRONTEND_URL")
+if frontend_url:
+    origins.append(frontend_url)
 
 app.add_middleware(
     CORSMiddleware,
