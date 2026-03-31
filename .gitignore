@@ -20,9 +20,10 @@ redis-data/
 # Ignore data folder in backend
 backend/data
 
-# Ignore testing
-backend/dataset.py
-backend/evaluate.py
-backend/results.json
+# Ignore testing artifacts
+backend/evaluate.py 
 backend/generate_pairs.py
+backend/instructions.txt
+backend/results.json
 backend/prompt_pairs.jsonl
+backend/uploads
