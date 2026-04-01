@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Request
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
 from database.database import get_db
 from database.models import Document, Message
 from helpers.jwt import get_current_user
@@ -21,45 +22,60 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
-
 @router.post("/api/documents")
 @limiter.limit("5/minute")
-def upload_document(
-    request: Request,
-    file: UploadFile = File(...),
-    db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user)
-):
+def upload_document(file: UploadFile = File(...), db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
+
+
     if file.content_type != "application/pdf":
         raise HTTPException(status_code=400, detail="Only PDF files are allowed")
+    
 
     user_email = current_user["username"]
+    try:
+        if db.query(Document).filter(Document.user_email == user_email, Document.filename == file.filename).first():
+            raise HTTPException(status_code=409, detail="A document with this name already exists")
+    except SQLAlchemyError as e:
+        logger.error(f"Could not query document with associated user: {e}")
+        raise HTTPException(status_code=500, detail="Database error")
+    
 
-    if db.query(Document).filter(Document.user_email == user_email, Document.filename == file.filename).first():
-        raise HTTPException(status_code=409, detail="A document with this name already exists")
-
-    user_dir = os.path.join(UPLOADS_DIR, user_email)
-    os.makedirs(user_dir, exist_ok=True)
-
-    filepath = os.path.join(user_dir, os.path.basename(file.filename))
+    filepath = None 
+    try: 
+        user_dir = os.path.join(UPLOADS_DIR, user_email)
+        os.makedirs(user_dir, exist_ok=True)
+        filepath = os.path.join(user_dir, os.path.basename(file.filename))
+    except OSError as e:
+        logger.error(f"Path Not found {e}")
+        raise HTTPException(status_code=500, detail="Something went wrong")
+    
 
     pdf_bytes = file.file.read()
     if not pdf_bytes.startswith(b"%PDF"):
         raise HTTPException(status_code=400, detail="Only PDF files are allowed")
 
+
     with open(filepath, "wb") as f:
-        f.write(pdf_bytes)
+        f.write(pdf_bytes)    
     size = len(pdf_bytes)
 
-    doc = Document(
-        user_email=user_email,
-        filename=file.filename,
-        filepath=filepath,
-        size=size,
-    )
-    db.add(doc)
-    db.commit()
-    db.refresh(doc)
+
+    doc = None 
+    try: 
+        doc = Document(
+            user_email=user_email,
+            filename=file.filename,
+            filepath=filepath,
+            size=size,
+        )
+        db.add(doc)
+        db.commit()
+        db.refresh(doc)
+    except SQLAlchemyError as e:
+        db.rollback()
+        logger.error(f"Error making change to database: {e}")
+        raise HTTPException(status_code=500, detail="Database error")
+        
 
     try:
         chunks = parse_pdf(pdf_bytes)
@@ -79,12 +95,17 @@ def upload_document(
 
 
 @router.get("/api/documents")
-def list_documents(
-    db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user)
-):
+def list_documents(db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
+
     user_email = current_user["username"]
-    docs = db.query(Document).filter(Document.user_email == user_email).all()
+
+    docs = None 
+    try:
+        docs = db.query(Document).filter(Document.user_email == user_email).all()
+    except SQLAlchemyError as e:
+        logger.error(f"Error querying user: {e}")
+        return HTTPException(status_code=500, detail="Database Error")
+    
     return [
         {
             "id": doc.id,
@@ -97,15 +118,19 @@ def list_documents(
 
 
 @router.get("/api/documents/{doc_id}/export")
-def export_document(
-    doc_id: int,
-    db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user)
-):
+def export_document(doc_id: int, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
+
+
     user_email = current_user["username"]
-    doc = db.query(Document).filter(Document.id == doc_id, Document.user_email == user_email).first()
-    if not doc:
-        raise HTTPException(status_code=404, detail="Document not found")
+
+    doc = None
+    try: 
+        doc = db.query(Document).filter(Document.id == doc_id, Document.user_email == user_email).first()
+        if not doc:
+            raise HTTPException(status_code=404, detail="Document not found")
+    except:
+        logger.error(f"Error querying the database: {e}")
+        return HTTPException(status_code=500, detail="Database Error")
 
     try:
         with open(doc.filepath, "rb") as f:
@@ -115,7 +140,7 @@ def export_document(
         logger.error("Failed to read/parse PDF for doc %s: %s", doc_id, e)
         raise HTTPException(status_code=500, detail="An unexpected error occurred")
 
-    # Collect semester and course data in document order
+    
     semesters = {}
     for _, metadata in chunks:
         if metadata["type"] == "semester":
@@ -133,7 +158,7 @@ def export_document(
     ws = wb.active
     ws.title = "Transcript"
 
-    # Styles
+ 
     sem_font = Font(bold=True, size=12)
     header_font = Font(bold=True)
     gpa_font = Font(bold=True, italic=True)
@@ -184,9 +209,9 @@ def export_document(
         gpa_cell.alignment = center
 
         apply_borders(sem_start, row, 1, len(COURSE_HEADERS))
-        row += 2  # blank separator
+        row += 2  
 
-    # Final summary table
+
     summary_start = row
 
     ws.merge_cells(start_row=row, start_column=1, end_row=row, end_column=3)
@@ -209,7 +234,6 @@ def export_document(
         ws.cell(row=row, column=3, value=sem_data["cum_gpa"]).alignment = center
         row += 1
 
-    # Average GPA row
     term_gpas = [float(d["term_gpa"]) for d in semesters.values() if d["term_gpa"]]
     avg_gpa = round(sum(term_gpas) / len(term_gpas), 3) if term_gpas else "N/A"
     ws.cell(row=row, column=1, value="Average").font = Font(bold=True)
@@ -220,14 +244,19 @@ def export_document(
     apply_borders(summary_start, row, 1, 3)
     row += 1
 
-    # Auto-fit column widths
     col_widths = [30, 40, 10, 20, 15, 10]
     for i, width in enumerate(col_widths, 1):
         ws.column_dimensions[get_column_letter(i)].width = width
 
-    buffer = io.BytesIO()
-    wb.save(buffer)
-    buffer.seek(0)
+
+    buffer = None 
+    try: 
+        buffer = io.BytesIO()
+        wb.save(buffer)
+        buffer.seek(0)
+    except Exception as e:
+        logger.error(f"Failed to export to workbook: {e}")
+        return HTTPException(status_code=500, detail="Something went wrong")
 
     export_filename = doc.filename.replace(".pdf", ".xlsx")
     return StreamingResponse(
@@ -240,13 +269,17 @@ def export_document(
 
 
 @router.delete("/api/documents/{doc_id}")
-def delete_document(
-    doc_id: int,
-    db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user)
-):
+def delete_document(doc_id: int, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
+
+
     user_email = current_user["username"]
-    doc = db.query(Document).filter(Document.id == doc_id, Document.user_email == user_email).first()
+
+    doc = None
+    try:
+        doc = db.query(Document).filter(Document.id == doc_id, Document.user_email == user_email).first()
+    except SQLAlchemyError as e:
+        logger.error(f"Error fetching user: {e}")
+        return HTTPException(status_code=500, detail="Database Error")
 
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found")
@@ -256,8 +289,13 @@ def delete_document(
 
     delete_index(f"{user_email}_{doc.filename}")
 
-    db.query(Message).filter(Message.document_id == doc_id).delete()
-    db.delete(doc)
-    db.commit()
+    try:
+        db.query(Message).filter(Message.document_id == doc_id).delete()
+        db.delete(doc)
+        db.commit()
+    except:
+        db.rollback()
+        logger.error(f"Error deleting document: {e}")
+        return HTTPException(status_code=500, detail="Database Error")
 
     return {"message": "Document deleted"}

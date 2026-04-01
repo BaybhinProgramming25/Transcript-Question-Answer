@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 
 from classes.userdata import LoginData, SignUpData
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
 
 from database.models import User
 from database.database import get_db
@@ -22,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 @router.post("/api/login")
 @limiter.limit("5/minute")
-def login(request: Request, data: LoginData, db: Session = Depends(get_db)):
+def login(data: LoginData, db: Session = Depends(get_db)):
 
     try:
         user = db.query(User).filter(User.email == data.email).first()
@@ -32,9 +33,6 @@ def login(request: Request, data: LoginData, db: Session = Depends(get_db)):
 
         if not verify_password(data.password, user.password):
             raise HTTPException(status_code=401, detail="Invalid Password")
-
-    except HTTPException:
-        raise
     except Exception as e:
         logger.error("Login error: %s", e)
         raise HTTPException(status_code=500, detail="An unexpected error occurred")
@@ -59,6 +57,7 @@ def login(request: Request, data: LoginData, db: Session = Depends(get_db)):
 
 @router.post("/api/logout")
 def logout():
+    
     response = JSONResponse(content={"message": "Logged out"}, status_code=200)
     response.delete_cookie(key="access_token", httponly=True, secure=True, samesite="lax")
     return response
@@ -66,11 +65,16 @@ def logout():
 
 @router.post("/api/signup")
 @limiter.limit("3/minute")
-def signup(request: Request, data: SignUpData, db: Session = Depends(get_db)):
+def signup(data: SignUpData, db: Session = Depends(get_db)):
 
-    email_exists = db.query(User).filter(User.email == data.email).first()
-    if email_exists:
-        raise HTTPException(status_code=409, detail="Email already exists")
+    try: 
+        email_exists = db.query(User).filter(User.email == data.email).first()
+        if email_exists:
+            raise HTTPException(status_code=409, detail="Email already exists")
+    except Exception as e:
+        logger.error("Logout error: %s", e)
+        raise HTTPException(status_code=500, detail="An unexpected error occurred")
+
     
     hashed_password = hash_password(data.password)
 
@@ -80,9 +84,14 @@ def signup(request: Request, data: SignUpData, db: Session = Depends(get_db)):
         email=data.email,
         password=hashed_password
     )
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
+
+    try:
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+    except SQLAlchemyError as e:
+        db.rollback()
+        raise 
 
     token = create_token({"username": data.email})
 

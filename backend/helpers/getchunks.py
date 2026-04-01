@@ -1,4 +1,3 @@
-"""3 different types of chunks that we need to get from parsing the PDF"""
 import re
 import fitz
 from helpers.constants import SEASONS, AVOIDED_CLASSES, TRANSFER_FORMARTS, TERMINATING_WORDS, GRADES_VALUE_MAPPING, MATH_PLACEMENT_MAPPING
@@ -21,7 +20,6 @@ def parse_pdf(file_bytes) -> list[str]:
 
 
 
-#### SEM LEVEL CHUNKS ####
 def get_sem_level_chunks(pdf_pages_list: list[str]) -> list[tuple[str, dict]]:
 
     semester_indices = _get_semester_indices(pdf_pages_list)
@@ -58,12 +56,14 @@ def get_sem_level_chunks(pdf_pages_list: list[str]) -> list[tuple[str, dict]]:
 
 
 def _is_valid_course_format(value: str) -> bool:
+
     if len(value) < 3:
         return False
     return all(char.isdigit() for char in value[0:3]) or any(word in value for word in TRANSFER_FORMARTS)
 
 
 def _get_sem_courses(data: list[str]) -> list[str]:
+
     courses = []
     i = 0
     while i < len(data):
@@ -78,6 +78,7 @@ def _get_sem_courses(data: list[str]) -> list[str]:
 
 
 def _get_sem_duration(data: list[str]) -> str:
+
     date_pattern = re.compile(r'\d{2}/\d{2}/\d{4}')
     date_range_pattern = re.compile(r'\d{2}/\d{2}/\d{4}\s*-\s*\d{2}/\d{2}/\d{4}')
 
@@ -86,7 +87,6 @@ def _get_sem_duration(data: list[str]) -> str:
         if match:
             return match.group().replace(" ", "")
 
-    # Fall back: find two consecutive lines each containing a date
     for i in range(len(data) - 1):
         m1 = date_pattern.fullmatch(data[i].strip())
         m2 = date_pattern.fullmatch(data[i + 1].strip())
@@ -117,7 +117,6 @@ def _get_gpa_after_keyword(data: list[str], keyword: str) -> float:
 
 
 
-#### COURSE LEVEL CHUNKS ####
 def get_course_level_chunks(pdf_pages_list: list[str]) -> list[tuple[str, dict]]:
 
     semester_indices = _get_semester_indices(pdf_pages_list)
@@ -133,6 +132,7 @@ def get_course_level_chunks(pdf_pages_list: list[str]) -> list[tuple[str, dict]]
 
 
 def _get_semester_indices(pdf_pages_list: list[str]) -> list[tuple]:
+
     semester_indices = []
     seen_labels = {}
 
@@ -171,6 +171,8 @@ def _is_terminator(value: str) -> bool:
 
 
 def _extract_course_chunks(data: list[str], semester_label: str) -> list[tuple[str, dict]]:
+
+
     chunks = []
     i = 0
 
@@ -252,7 +254,7 @@ def get_student_info_chunks(pdf_pages_list: list[str]) -> list[tuple[str, dict]]
         seen_courses.update(_get_sem_courses(data))
     total_courses = len(seen_courses)
 
-    # Final cumulative GPA — scan backwards for the last "Cum" entry
+  
     final_cum_gpa = 0.0
     for i in range(len(pdf_pages_list) - 1, -1, -1):
         if pdf_pages_list[i].strip().startswith("Cum"):
@@ -261,14 +263,16 @@ def get_student_info_chunks(pdf_pages_list: list[str]) -> list[tuple[str, dict]]
                 break
 
     chunk = (
-        f"Student Name: {name}. "
-        f"Student ID: {student_id}. "
-        f"University: Stony Brook University. "  # Hard-coded value as this application would only work for Stony Brook University transcripts
-        f"Major: {major}. "
-        f"Total Semesters: {total_semesters}. "
-        f"Total Courses Taken: {total_courses}. "
+        f"Student Name: {name}."
+        f"Student ID: {student_id}."
+        f"University: Stony Brook University."
+        f"Major: {major}."
+        f"Total Semesters: {total_semesters}."
+        f"Total Courses Taken: {total_courses}."
         f"Final Cumulative GPA: {final_cum_gpa if final_cum_gpa > 0.0 else 'N/A'}."
     )
+
+
     metadata = {
         "type": "student",
         "name": name,
@@ -283,9 +287,9 @@ def get_student_info_chunks(pdf_pages_list: list[str]) -> list[tuple[str, dict]]
 
 
 def _get_field_after_keyword(pdf_pages_list: list[str], keyword: str) -> str:
+
     for i, line in enumerate(pdf_pages_list):
         if keyword in line:
-            # Value may be on the same line after the keyword, or on the next line
             after = line.split(keyword, 1)[-1].strip()
             if after:
                 return after

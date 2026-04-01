@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from slowapi import _rate_limit_exceeded_handler
@@ -28,6 +28,7 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(SlowAPIMiddleware)
 
+
 origins = ["http://localhost:5173"]
 frontend_url = os.getenv("FRONTEND_URL")
 if frontend_url:
@@ -45,6 +46,7 @@ app.include_router(qa_router)
 app.include_router(user_router)
 app.include_router(documents_router)
 
+
 @app.get("/health")
 def health():
     try:
@@ -52,6 +54,5 @@ def health():
             conn.execute(text("SELECT 1"))
         return {"status": "ok"}
     except Exception:
-        from fastapi import HTTPException
         raise HTTPException(status_code=503, detail="Database unavailable")
 
