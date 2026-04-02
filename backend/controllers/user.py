@@ -33,9 +33,9 @@ def login(data: LoginData, db: Session = Depends(get_db)):
 
         if not verify_password(data.password, user.password):
             raise HTTPException(status_code=401, detail="Invalid Password")
-    except Exception as e:
+    except SQLAlchemyError as e:
         logger.error("Login error: %s", e)
-        raise HTTPException(status_code=500, detail="An unexpected error occurred")
+        raise HTTPException(status_code=500, detail="Database Error")
 
 
     token = create_token({"username": data.email})
@@ -48,8 +48,8 @@ def login(data: LoginData, db: Session = Depends(get_db)):
     response.set_cookie(
         key="access_token",
         value=token,
-        httponly=True, # JavaScript can't alter this cookie
-        secure=True, # send only over HTTPS
+        httponly=True,
+        secure=True, 
         samesite="lax",
         max_age=3600
     )
@@ -71,8 +71,8 @@ def signup(data: SignUpData, db: Session = Depends(get_db)):
         email_exists = db.query(User).filter(User.email == data.email).first()
         if email_exists:
             raise HTTPException(status_code=409, detail="Email already exists")
-    except Exception as e:
-        logger.error("Logout error: %s", e)
+    except SQLAlchemyError as e:
+        logger.error("Signup error: %s", e)
         raise HTTPException(status_code=500, detail="An unexpected error occurred")
 
     

@@ -75,13 +75,10 @@ def parse(message: str = Form(...), document_id: int = Form(...), db: Session = 
     except SQLAlchemyError:
         raise HTTPException(status_code=500, detail="Database querying error ")
     
-
     
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found")
     
-
-
     if _is_export_intent(message):
         reply = "Sure! Exporting your transcript to Excel now..."
         try:
