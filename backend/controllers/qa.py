@@ -61,7 +61,7 @@ def get_messages(document_id: int, db: Session = Depends(get_db), current_user: 
 
 @router.post("/parse")
 @limiter.limit("10/minute")
-def parse(message: str = Form(...), document_id: int = Form(...), db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
+def parse(request: Request, message: str = Form(...), document_id: int = Form(...), db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
 
     if not message.strip():
         raise HTTPException(status_code=400, detail="Message cannot be empty")

@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 @router.post("/api/login")
 @limiter.limit("5/minute")
-def login(data: LoginData, db: Session = Depends(get_db)):
+def login(request: Request, data: LoginData, db: Session = Depends(get_db)):
 
     try:
         user = db.query(User).filter(User.email == data.email).first()
@@ -65,7 +65,7 @@ def logout():
 
 @router.post("/api/signup")
 @limiter.limit("3/minute")
-def signup(data: SignUpData, db: Session = Depends(get_db)):
+def signup(request: Request, data: SignUpData, db: Session = Depends(get_db)):
 
     try: 
         email_exists = db.query(User).filter(User.email == data.email).first()
