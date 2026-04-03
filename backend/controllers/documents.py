@@ -104,7 +104,7 @@ def list_documents(db: Session = Depends(get_db), current_user: dict = Depends(g
         docs = db.query(Document).filter(Document.user_email == user_email).all()
     except SQLAlchemyError as e:
         logger.error(f"Error querying user: {e}")
-        return HTTPException(status_code=500, detail="Database Error")
+        raise HTTPException(status_code=500, detail="Database Error")
     
     return [
         {
@@ -130,7 +130,7 @@ def export_document(doc_id: int, db: Session = Depends(get_db), current_user: di
             raise HTTPException(status_code=404, detail="Document not found")
     except SQLAlchemyError as e:
         logger.error(f"Error querying the database: {e}")
-        return HTTPException(status_code=500, detail="Database Error")
+        raise HTTPException(status_code=500, detail="Database Error")
 
     try:
         with open(doc.filepath, "rb") as f:
@@ -256,7 +256,7 @@ def export_document(doc_id: int, db: Session = Depends(get_db), current_user: di
         buffer.seek(0)
     except Exception as e:
         logger.error(f"Failed to export to workbook: {e}")
-        return HTTPException(status_code=500, detail="Something went wrong")
+        raise HTTPException(status_code=500, detail="Something went wrong")
 
     export_filename = doc.filename.replace(".pdf", ".xlsx")
     return StreamingResponse(
@@ -279,7 +279,7 @@ def delete_document(doc_id: int, db: Session = Depends(get_db), current_user: di
         doc = db.query(Document).filter(Document.id == doc_id, Document.user_email == user_email).first()
     except SQLAlchemyError as e:
         logger.error(f"Error fetching user: {e}")
-        return HTTPException(status_code=500, detail="Database Error")
+        raise HTTPException(status_code=500, detail="Database Error")
 
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found")
@@ -296,6 +296,6 @@ def delete_document(doc_id: int, db: Session = Depends(get_db), current_user: di
     except SQLAlchemyError as e:
         db.rollback()
         logger.error(f"Error deleting document: {e}")
-        return HTTPException(status_code=500, detail="Database Error")
+        raise HTTPException(status_code=500, detail="Database Error")
 
     return {"message": "Document deleted"}
