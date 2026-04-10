@@ -1,5 +1,6 @@
 import re
 import fitz
+
 from helpers.constants import SEASONS, AVOIDED_CLASSES, TRANSFER_FORMARTS, TERMINATING_WORDS, GRADES_VALUE_MAPPING, MATH_PLACEMENT_MAPPING
 
 def parse_pdf(file_bytes) -> list[str]:
@@ -12,11 +13,13 @@ def parse_pdf(file_bytes) -> list[str]:
         pdf_pages_list.extend(text)
     pdf_pages_list = [" ".join(line.split()) for line in pdf_pages_list if line.strip()]
     
-    return [
+    all_chunks =  [
         *get_sem_level_chunks(pdf_pages_list),
         *get_course_level_chunks(pdf_pages_list),
         *get_student_info_chunks(pdf_pages_list),
     ]
+
+    return all_chunks
 
 
 
@@ -52,6 +55,17 @@ def get_sem_level_chunks(pdf_pages_list: list[str]) -> list[tuple[str, dict]]:
             "courses": courses,
         }
         semester_chunks.append((chunk, metadata))
+
+    chunk = (
+        f"The student took {len(semester_chunks)} semesters in total"
+    )
+
+    metadata = {
+        "num_semesters": len(semester_chunks)
+    }
+
+    semester_chunks.append((chunk, metadata))
+    
     return semester_chunks
 
 
@@ -172,7 +186,6 @@ def _is_terminator(value: str) -> bool:
 
 def _extract_course_chunks(data: list[str], semester_label: str) -> list[tuple[str, dict]]:
 
-
     chunks = []
     i = 0
 
@@ -237,11 +250,11 @@ def _extract_course_chunks(data: list[str], semester_label: str) -> list[tuple[s
 
 
 def get_student_info_chunks(pdf_pages_list: list[str]) -> list[tuple[str, dict]]:
+
     name = _get_field_after_keyword(pdf_pages_list, "Name:")
     student_id = _get_field_after_keyword(pdf_pages_list, "Student ID:")
     major = _get_field_after_keyword(pdf_pages_list, "Plan:")
 
-    # Count real semesters (exclude Transfer Credits)
     semester_indices = _get_semester_indices(pdf_pages_list)
     real_semesters = [(label, start) for label, start in semester_indices if label != "Transfer Credits"]
     total_semesters = len(real_semesters)
@@ -262,28 +275,40 @@ def get_student_info_chunks(pdf_pages_list: list[str]) -> list[tuple[str, dict]]
             if final_cum_gpa > 0.0:
                 break
 
-    chunk = (
-        f"Student Name: {name}."
-        f"Student ID: {student_id}."
-        f"University: Stony Brook University."
-        f"Major: {major}."
-        f"Total Semesters: {total_semesters}."
-        f"Total Courses Taken: {total_courses}."
-        f"Final Cumulative GPA: {final_cum_gpa if final_cum_gpa > 0.0 else 'N/A'}."
+    chunks = []
+
+    chunk_student = (
+        f"Student Name: {name},"
+        f"Student ID: {student_id},"
+        f"University: Stony Brook University,"
+        f"Major: {major},"
+        f"Final Cumulative GPA: {final_cum_gpa if final_cum_gpa > 0.0 else 'N/A'},"
     )
 
 
-    metadata = {
+    metadata_student = {
         "type": "student",
         "name": name,
         "student_id": student_id,
         "university": "Stony Brook University",
         "major": major,
-        "total_semesters": total_semesters,
-        "total_courses": total_courses,
         "final_cum_gpa": final_cum_gpa if final_cum_gpa > 0.0 else None,
     }
-    return [(chunk, metadata)]
+
+    chunk_total = (
+        f"Total Semesters: {total_semesters}",
+        f"Total Courses: {total_courses}"
+    )
+
+    metadata_total = {
+        "type": "total",
+        "total_semesters": total_semesters,
+        "total_courses": total_courses
+    }
+
+    chunks.append((chunk_student, metadata_student))
+    chunks.append((chunk_total, metadata_total))
+    return chunks
 
 
 def _get_field_after_keyword(pdf_pages_list: list[str], keyword: str) -> str:

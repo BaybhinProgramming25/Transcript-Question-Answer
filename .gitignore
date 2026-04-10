@@ -23,3 +23,6 @@ backend/instructions.txt
 backend/results.json
 backend/prompt_pairs.jsonl
 backend/uploads
+
+# Ignore main.py used for backend testing
+backend/main.py

@@ -17,7 +17,7 @@ _embeddings: OpenAIEmbeddings | None = None
 def get_embeddings(openai_api_key: str) -> OpenAIEmbeddings:
     global _embeddings
     if _embeddings is None:
-        _embeddings = OpenAIEmbeddings(api_key=openai_api_key, model="text-embedding-3-small")
+        _embeddings = OpenAIEmbeddings(api_key=openai_api_key, model="text-embedding-3-large")
     return _embeddings
 
 
@@ -83,6 +83,15 @@ def query(question: str, index_key: str, openai_api_key: str) -> str:
     vector_store = load_db(index_key, openai_api_key)
     retriever = vector_store.as_retriever(search_kwargs={"k": 5})
 
+    """
+    docs = retriever.invoke(question)
+    for doc in docs:
+        print("-----------------------")
+        print(doc.page_content)
+        print(doc.metadata)
+        print("---------------------\n")
+    """
+
     prompt = PromptTemplate.from_template("""
 You are a helpful assistant that answers questions about a student's academic transcript. \
 Use only the context provided to answer. Answer directly as if you were talking to a real student. \
@@ -107,3 +116,4 @@ Answer:""")
     )
 
     return chain.invoke(question)
+
