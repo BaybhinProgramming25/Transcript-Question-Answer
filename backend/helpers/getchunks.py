@@ -296,7 +296,7 @@ def get_student_info_chunks(pdf_pages_list: list[str]) -> list[tuple[str, dict]]
     }
 
     chunk_total = (
-        f"Total Semesters: {total_semesters}",
+        f"Total Semesters: {total_semesters},"
         f"Total Courses: {total_courses}"
     )
 
