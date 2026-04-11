@@ -6,9 +6,9 @@ const Home = () => {
     <div className="home-page">
       {/* Hero */}
       <section className="home-hero">
-        <h1 className="home-hero-title">Your transcript, answered instantly</h1>
+        <h1 className="home-hero-title">Your Transcript, Answered Instantly</h1>
         <p className="home-hero-sub">
-          TQA lets Stony Brook CS students upload their transcripts and ask any question
+          Transcript QA lets Stony Brook CS students upload their transcripts and ask any question
           about their academic records — powered by AI.
         </p>
         <div className="home-hero-ctas">
@@ -23,26 +23,26 @@ const Home = () => {
           <div className="home-feature-icon">📄</div>
           <h2>Upload Your Transcript</h2>
           <p>
-            Drop your Stony Brook CS transcript PDF into the chat. TQA parses it
-            in-memory instantly — no files stored on disk, keeping your data private.
+            Upload a PDF of your Stony Brook transcript and TQA will instantly parse
+            and analyze it — no account linking required, just drag and drop.
           </p>
         </div>
 
         <div className="home-feature-card">
           <div className="home-feature-icon">💬</div>
-          <h2>Ask Anything</h2>
+          <h2>Ask Natural Language Questions</h2>
           <p>
-            Ask natural-language questions like "What's my GPA?", "How many credits
-            do I have?", or "What did I take in Fall 2023?" and get instant answers.
+            Ask anything about your transcript in plain English — like "What's my GPA?",
+            "How many credits do I have?", or "Did I pass all my major requirements?"
           </p>
         </div>
 
         <div className="home-feature-card">
-          <div className="home-feature-icon">🔒</div>
-          <h2>Private by Design</h2>
+          <div className="home-feature-icon">📤</div>
+          <h2>Export Your Transcript</h2>
           <p>
-            Your transcript data is never written to disk. Everything is processed
-            in-memory and discarded when your session ends.
+            Need a formatted copy? Just ask TQA to export your transcript and get a
+            clean, shareable version generated on the spot.
           </p>
         </div>
       </section>
