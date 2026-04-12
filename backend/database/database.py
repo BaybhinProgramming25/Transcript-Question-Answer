@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker, DeclarativeBase
 load_dotenv(interpolate=True, override=True)
 import os 
 
-DATABASE_URL= os.getenv("DATABASE_URL")
+DATABASE_URL = os.getenv("DATABASE_URL")
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(bind=engine)
 
@@ -18,7 +18,7 @@ def get_db():
         yield db 
     except Exception:
         db.rollback()
-        raise # Re-raise it to send it back to FastAPI  
+        raise # C
     finally:
         db.close()
 

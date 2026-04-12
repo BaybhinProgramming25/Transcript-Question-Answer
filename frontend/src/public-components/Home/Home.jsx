@@ -46,6 +46,30 @@ const Home = () => {
           </p>
         </div>
       </section>
+
+      {/* Sample transcript preview */}
+      <section className="home-preview">
+        <div className="home-preview-header">
+          <h2 className="home-preview-title">What does a transcript look like?</h2>
+          <p className="home-preview-desc">
+            Here's a sample Stony Brook transcript so you know exactly what to upload.
+          </p>
+        </div>
+        <div className="home-preview-frame-wrap">
+          <iframe
+            className="home-preview-frame"
+            src="/sample.pdf"
+            title="Sample transcript"
+          />
+        </div>
+        <a
+          className="home-preview-download"
+          href="/sample.pdf"
+          download="sample-transcript.pdf"
+        >
+          Download sample
+        </a>
+      </section>
     </div>
   );
 };
