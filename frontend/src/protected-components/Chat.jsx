@@ -17,23 +17,6 @@ const Chat = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
 
-  const handleSelectDoc = async (doc) => {
-    setInputValue('');
-    setSelectedDoc(doc);
-    if (!doc) { setMessages([]); return; }
-    try {
-      const response = await api.get(`/api/messages/${doc.id}`);
-      setMessages(response.data.map(m => ({
-        id: m.id,
-        text: m.text,
-        sender: m.sender,
-        timestamp: new Date(m.created_at).toLocaleTimeString(),
-      })));
-    } catch {
-      setMessages([]);
-    }
-  };
-
   const handleSendMessage = async () => {
     if (inputValue.trim() === '' || !selectedDoc) return;
 
@@ -103,16 +86,57 @@ const Chat = () => {
     el.style.height = Math.min(el.scrollHeight, 160) + 'px';
   };
 
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const isEmpty = messages.length === 0;
+
+  const handleSelectDoc = async (doc) => {
+    setSidebarOpen(false);
+    setInputValue('');
+    setSelectedDoc(doc);
+    if (!doc) { setMessages([]); return; }
+    try {
+      const response = await api.get(`/api/messages/${doc.id}`);
+      setMessages(response.data.map(m => ({
+        id: m.id,
+        text: m.text,
+        sender: m.sender,
+        timestamp: new Date(m.created_at).toLocaleTimeString(),
+      })));
+    } catch {
+      setMessages([]);
+    }
+  };
 
   return (
     <div className="chat-page">
-      <Sidebar onSelectDoc={handleSelectDoc} selectedDoc={selectedDoc} />
+      {sidebarOpen && (
+        <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />
+      )}
+
+      <Sidebar
+        onSelectDoc={handleSelectDoc}
+        selectedDoc={selectedDoc}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
 
       <div className="chat-main">
 
+        <div className="chat-mobile-header">
+          <button
+            className="chat-menu-btn"
+            onClick={() => setSidebarOpen(true)}
+            aria-label="Open menu"
+          >
+            ☰
+          </button>
+          <span className="chat-mobile-title">
+            {selectedDoc ? `📄 ${selectedDoc.filename}` : 'TQA'}
+          </span>
+        </div>
+
         {selectedDoc && (
-          <div className="chat-doc-banner">
+          <div className="chat-doc-banner chat-doc-banner--desktop">
             <span>📄 {selectedDoc.filename}</span>
           </div>
         )}

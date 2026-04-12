@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import api from '../../api/index.js';
 import './Sidebar.css';
 
-const Sidebar = ({ onSelectDoc, selectedDoc }) => {
+const Sidebar = ({ onSelectDoc, selectedDoc, isOpen, onClose }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -87,7 +87,7 @@ const Sidebar = ({ onSelectDoc, selectedDoc }) => {
     : (user?.email?.[0] ?? 'U').toUpperCase();
 
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar${isOpen ? ' sidebar--open' : ''}`}>
       <div className="sidebar-top">
         <div className="sidebar-logo">
           <span className="sidebar-logo-icon">T</span>
