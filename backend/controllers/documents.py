@@ -60,8 +60,15 @@ def upload_document(request: Request, file: UploadFile = File(...), db: Session 
     size = len(pdf_bytes)
 
 
-    doc = None 
-    try: 
+    try:
+        chunks = parse_pdf(pdf_bytes)
+        init_db(chunks, f"{user_email}_{file.filename}", OPENAI_API_KEY)
+    except Exception as e:
+        logger.error("Failed to build FAISS index for user %s, file %s: %s", user_email, file.filename, e)
+        raise HTTPException(status_code=500, detail="An unexpected error occurred")
+
+    doc = None
+    try:
         doc = Document(
             user_email=user_email,
             filename=file.filename,
@@ -75,14 +82,6 @@ def upload_document(request: Request, file: UploadFile = File(...), db: Session 
         db.rollback()
         logger.error(f"Error making change to database: {e}")
         raise HTTPException(status_code=500, detail="Database error")
-        
-
-    try:
-        chunks = parse_pdf(pdf_bytes)
-        init_db(chunks, f"{user_email}_{file.filename}", OPENAI_API_KEY)
-    except Exception as e:
-        logger.error("Failed to build FAISS index for user %s, file %s: %s", user_email, file.filename, e)
-        raise HTTPException(status_code=500, detail="An unexpected error occurred")
 
     return {
         "id": doc.id,
