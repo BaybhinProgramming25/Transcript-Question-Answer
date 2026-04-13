@@ -142,13 +142,13 @@ def export_document(doc_id: int, db: Session = Depends(get_db), current_user: di
     
     semesters = {}
     for _, metadata in chunks:
-        if metadata["type"] == "semester":
+        if metadata.get("type") == "semester":
             semesters[metadata["semester"]] = {
                 "term_gpa": metadata["term_gpa"],
                 "cum_gpa": metadata["cum_gpa"],
                 "courses": [],
             }
-        elif metadata["type"] == "course":
+        elif metadata.get("type") == "course":
             label = metadata["semester"]
             if label in semesters:
                 semesters[label]["courses"].append(metadata)
