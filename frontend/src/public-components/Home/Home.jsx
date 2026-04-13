@@ -62,13 +62,9 @@ const Home = () => {
             title="Sample transcript"
           />
         </div>
-        <a
-          className="home-preview-download"
-          href="/sample.pdf"
-          download="sample-transcript.pdf"
-        >
-          Download sample
-        </a>
+        <p className="home-preview-note">
+          Note: this is not a one-to-one copy of real Stony Brook student transcripts but rather a relative approximation of what the structure looks like.
+        </p>
       </section>
     </div>
   );

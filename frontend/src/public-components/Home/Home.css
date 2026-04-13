@@ -151,16 +151,13 @@
   display: block;
 }
 
-.home-preview-download {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--accent);
-  text-decoration: none;
-}
-
-.home-preview-download:hover {
-  color: var(--accent-hover);
-  text-decoration: underline;
+.home-preview-note {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-style: italic;
+  text-align: center;
+  max-width: 560px;
+  line-height: 1.6;
 }
 
 @media (max-width: 768px) {
