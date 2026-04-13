@@ -5,7 +5,7 @@ TQA is a web application that lets Stony Brook CS students upload their academic
 ## Features
 
 - Upload a PDF transcript and have it parsed and indexed automatically
-- Ask natural language questions — "What's my GPA?", "How many credits do I have?"
+- Ask natural language questions — "What's my GPA?", "What classes did I take this semester?", "What was my GPA during this semester?"
 - Export your transcript to a formatted Excel (.xlsx) file
 - Persistent chat history per document
 - JWT-authenticated sessions with rate limiting
