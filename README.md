@@ -25,6 +25,6 @@ TQA is a web application that lets Stony Brook CS students upload their academic
 - Let's Encrypt for HTTPS
 
 
-## Begin Using
+## How to Use
 
-Visit www.transcriptqa.org, see the sample PDF that is on the homepage, make an account, and begin asking questions! 
+Visit www.transcriptqa.org, sign up, and start asking questions!
