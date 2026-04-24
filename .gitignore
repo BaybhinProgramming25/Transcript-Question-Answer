@@ -4,6 +4,7 @@
 # Ignore env 
 env/
 **/.env
+*/.env
 
 # Ignore pycache 
 __pycache__/
