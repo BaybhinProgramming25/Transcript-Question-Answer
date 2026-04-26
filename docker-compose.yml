@@ -1,6 +1,8 @@
 services:
   tqa-mysql:
     image: mysql
+    command: --innodb-buffer-pool-size=128M
+    mem_limit: 256m
     env_file:
       - ./backend/.env
     healthcheck:
